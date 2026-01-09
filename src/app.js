@@ -37,7 +37,7 @@ app.use(express.json());
 /* Routes */
 app.use('/api', inventoryRoutes);
 app.use('/api', stockRoutes);
-app.use('/api', authRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/api', purchaseRoutes);
 app.use("/api", supplierRoutes);
 
