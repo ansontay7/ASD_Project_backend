@@ -1,7 +1,7 @@
 const db = require("../config/db");  // Assuming this exports the PostgreSQL connection pool
 
 exports.createTransaction = async (req, res) => {
-  const { item_id, transaction_type, quantity } = req.body;
+  const { item_id, transaction_type, quantity, reason } = req.body;
 
   // ✅ TAKE user_id FROM TOKEN
   const user_id = req.user.user_id;
@@ -49,8 +49,8 @@ exports.createTransaction = async (req, res) => {
     // 4️⃣ Insert transaction
     const insertSql = `
       INSERT INTO stock_transactions
-      (item_id, user_id, transaction_type, quantity, transaction_date)
-      VALUES ($1, $2, $3, $4, CURRENT_DATE)
+      (item_id, user_id, transaction_type, quantity, reason, transaction_date)
+      VALUES ($1, $2, $3, $4, $5, CURRENT_DATE)
       RETURNING transaction_id
     `;
 
@@ -59,6 +59,7 @@ exports.createTransaction = async (req, res) => {
       user_id,
       transaction_type,
       quantity,
+      reason || "No reason provided",
     ]);
 
     const transaction_id = insertResult.rows[0].transaction_id;
@@ -93,6 +94,7 @@ exports.getStockHistory = async (req, res) => {
         i.item_name,
         st.transaction_type,
         st.quantity,
+        st.reason,
         u.name AS performed_by,
         st.created_at
       FROM stock_transactions st
