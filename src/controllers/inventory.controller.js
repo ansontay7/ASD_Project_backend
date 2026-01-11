@@ -25,7 +25,7 @@ exports.createItem = async (req, res) => {
     const result = await Inventory.create(req.body);
     res.status(201).json({
       message: 'Item created',
-      id: result.insertId
+      id: result.item_id
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
