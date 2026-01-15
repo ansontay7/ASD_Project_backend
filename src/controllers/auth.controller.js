@@ -74,7 +74,7 @@ exports.register = async (req, res) => {
     // 4️⃣ Insert new user
     const { rows } = await db.query(
       'INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4) RETURNING user_id, name, role',
-      [name, email, hashedPassword, 'user'] // default role = 'user'
+      [name, email, hashedPassword, 'User'] // default role = 'user'
     );
 
     const newUser = rows[0];
