@@ -47,3 +47,59 @@ exports.login = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+exports.register = async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+
+    // 1️⃣ Validate input
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    // 2️⃣ Check if user already exists
+    const { rows: existingUsers } = await db.query(
+      'SELECT user_id FROM users WHERE email = $1',
+      [email]
+    );
+
+    if (existingUsers.length > 0) {
+      return res.status(400).json({ message: 'Email is already registered' });
+    }
+
+    // 3️⃣ Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // 4️⃣ Insert new user
+    const { rows } = await db.query(
+      'INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4) RETURNING user_id, name, role',
+      [name, email, hashedPassword, 'user'] // default role = 'user'
+    );
+
+    const newUser = rows[0];
+
+    // 5️⃣ Optional: generate token immediately after registration
+    const token = jwt.sign(
+      {
+        user_id: newUser.user_id,
+        role: newUser.role,
+        name: newUser.name
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
+    res.status(201).json({
+      message: 'User registered successfully',
+      token,
+      user_id: newUser.user_id,
+      role: newUser.role
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
