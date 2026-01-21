@@ -27,10 +27,10 @@ exports.createTransaction = async (req, res) => {
 
     const currentQty = result.rows[0].quantity;
 
-    // 2️⃣ Validate OUT transaction (Admin only)
-    if (transaction_type === "OUT" && req.user.role !== "Admin") {
+    // 2️⃣ Validate IN transaction (Admin only)
+    if (transaction_type === "IN" && req.user.role !== "Admin") {
       return res.status(403).json({
-        message: "Only Admin can perform stock OUT",
+        message: "Only Admin can perform stock IN",
       });
     }
 
@@ -42,7 +42,7 @@ exports.createTransaction = async (req, res) => {
 
     // 3️⃣ Calculate new quantity
     const newQty =
-      transaction_type === "IN"
+      transaction_type === "OUT"
         ? currentQty + quantity
         : currentQty - quantity;
 
