@@ -10,24 +10,23 @@ const supplierRoutes = require("./routes/supplier.routes");
 const app = express();
 
 /* 🔑 CORS SETUP */
+/* Allowed origins */
 const allowedOrigins = [
-  "http://localhost:5173", // local dev
-  "https://asd-project-frontend.vercel.app" // production frontend
+  "http://localhost:5173",
+  "https://asd-project-frontend.vercel.app"
 ];
 
+/* CORS Middleware */
 app.use(cors({
-  origin: function(origin, callback){
-    // allow requests with no origin (like Postman)
-    if(!origin) return callback(null, true);
-
-    if(allowedOrigins.indexOf(origin) === -1){
-      const msg = `The CORS policy for this site does not allow access from the specified Origin.`;
-      return callback(new Error(msg), false);
+  origin: function(origin, callback) {
+    if (!origin) return callback(null, true); // allow Postman / curl
+    if (allowedOrigins.indexOf(origin) === -1) {
+      return callback(new Error("Not allowed by CORS"), false);
     }
     return callback(null, true);
   },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ["GET","POST","PUT","DELETE","OPTIONS"],
+  allowedHeaders: ["Content-Type","Authorization"],
   credentials: true
 }));
 
