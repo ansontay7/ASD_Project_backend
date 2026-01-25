@@ -42,7 +42,7 @@ exports.createTransaction = async (req, res) => {
 
     // 3️⃣ Calculate new quantity
     const newQty =
-      transaction_type === "OUT"
+      transaction_type === "IN"
         ? currentQty + quantity
         : currentQty - quantity;
 
